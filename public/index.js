@@ -167,19 +167,22 @@ function step2(){
     for(let b = 0 ; b < bars.length ; b++){
         if( events[e].barId == bars[b].id){
           if( events[e].persons > 10 && events[e].persons <= 20){
-            bars[b].pricePerPerson = bars[b].pricePerPerson * ( 1- (10/100));
+            events[e].price =  events[e].time * bars[b].pricePerHour + events[e].persons*(bars[b].pricePerPerson* ( 1- (10/100)));
           }
           if( events[e].persons > 20 && events[e].persons <= 60){
-            bars[b].pricePerPerson = bars[b].pricePerPerson * ( 1- (30/100));
+            //bars[b].pricePerPerson = bars[b].pricePerPerson * ( 1- (30/100));
+            events[e].price =  events[e].time * bars[b].pricePerHour + events[e].persons*(bars[b].pricePerPerson* ( 1- (30/100)));
           }
           if( events[e].persons > 60){
-            bars[b].pricePerPerson = bars[b].pricePerPerson * ( 1- (50/100));
+            //bars[b].pricePerPerson = bars[b].pricePerPerson * ( 1- (50/100));
+            events[e].price =  events[e].time * bars[b].pricePerHour + events[e].persons*(bars[b].pricePerPerson* ( 1- (50/100)));
           }
         }
       }
   }
-  step1();
+  //step1();
 }
+
 
 step1();
 step2();
