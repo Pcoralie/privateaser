@@ -152,6 +152,10 @@ console.log(bars);
 console.log(events);
 console.log(actors);
 
+//Step 1 : Euro-People
+// Booking price = time component + people component
+// time component : the number of booked time multiplied by the bar price per hour
+// people component : the number of persons multiplied by the bar price per person
 function step1(){
   for(let e = 0 ; e < events.length ; e++){
     for(let b = 0 ; b < bars.length ; b++){
@@ -162,39 +166,58 @@ function step1(){
   }
 }
 
+// Step 2 : Send more, pay less
 function step2(){
   for(let e = 0 ; e < events.length ; e++){
     for(let b = 0 ; b < bars.length ; b++){
         if( events[e].barId == bars[b].id){
+
+          // price per people decreases by 10% after 10 persons
           if( events[e].persons > 10 && events[e].persons <= 20){
             events[e].price =  events[e].time * bars[b].pricePerHour + events[e].persons*(bars[b].pricePerPerson* ( 1- (10/100)));
           }
+
+          // price per people decreases by 30% after 20 persons
           if( events[e].persons > 20 && events[e].persons <= 60){
-            //bars[b].pricePerPerson = bars[b].pricePerPerson * ( 1- (30/100));
             events[e].price =  events[e].time * bars[b].pricePerHour + events[e].persons*(bars[b].pricePerPerson* ( 1- (30/100)));
           }
+
+          //price per people decreases by 50% after 60 persons
           if( events[e].persons > 60){
-            //bars[b].pricePerPerson = bars[b].pricePerPerson * ( 1- (50/100));
             events[e].price =  events[e].time * bars[b].pricePerHour + events[e].persons*(bars[b].pricePerPerson* ( 1- (50/100)));
           }
         }
       }
   }
-  //step1();
 }
 
+
+// Step 3 : Give me all your money
 function step3(){
   for( let e = 0; e<events.length; e++){
+
+    //There is a 30% commission on the booking price to cover the costs
     var commission = events[e].price * 0.3;
+
+    // insurance have the half of commission
     var insurance = commission / 2 ;
+
+    //Treasury : 1 euro by person
     var treasury = 1* events[e].persons;
+
+    //Privateaser : the rest of the commission
+    // rest = commission - insurance - treasury
     var privateaser = commission - insurance - treasury;
+
+    // We affect the amount :
     events[e].commission.insurance = insurance;
     events[e].commission.treasury = treasury;
     events[e].commission.privateaser= privateaser;
    }
 }
 
+//Step 4 : The famous deductible
+// If the booker chooses the deductible reduction option, he is charged an additional 1euro/person
 function step4(){
   for (let e = 0; e<events.length ; e++){
     if(events[e].options.deductibleReduction == true){
@@ -204,7 +227,55 @@ function step4(){
 }
 
 
+//Step 5 : Pay the actors
+function step5(){
+  for(let a = 0 ; a < actors.length ; a++){
+    for( let e = 0 ; e< events.length ; e++){
+      if( events[e].id == actors[a].eventId){
+        for(let p = 0 ; p < actors[a].payment.length ; p ++){
+
+          //The booker must pay the booking price and the (optional) deducticle reduction
+          // It is also the price calculated in the step 4
+              if(actors[a].payment[p].who == "booker"){
+                  actors[a].payment[p].amount = events[e].price;
+              }
+
+         //The bar receives the booking price minus the commission
+              if(actors[a].payment[p].who == "bar"){
+                var bookingPrice = events[e].price;
+                if(events[e].options.deductibleReduction == true){
+                    bookingPrice = events[e].price - 1*events[e].persons;
+                }
+                actors[a].payment[p].amount = bookingPrice - 0.3*bookingPrice ;
+              }
+
+          //The insurance receives its part of the commission
+              if(actors[a].payment[p].who == "insurance"){
+                  actors[a].payment[p].amount = events[e].commission.insurance;
+              }
+
+          // The treasury receives its part of the tax commission
+              if(actors[a].payment[p].who == "treasury"){
+                  actors[a].payment[p].amount = events[e].commission.treasury;
+              }
+
+          //Privateaser receives its part of the commission, plus the deductible reduction
+              if(actors[a].payment[p].who == "privateaser"){
+                var deductibleReduction = 0;
+                if(events[e].options.deductibleReduction == true){
+                  deductibleReduction = 1*events[e].persons;
+                }
+                actors[a].payment[p].amount = events[e].commission.privateaser + deductibleReduction;
+              }
+        }
+      }
+    }
+  }
+}
+
+
 step1();
 step2();
 step3();
-step4(); 
+step4();
+step5();
