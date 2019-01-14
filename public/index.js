@@ -189,16 +189,22 @@ function step3(){
     var insurance = commission / 2 ;
     var treasury = 1* events[e].persons;
     var privateaser = commission - insurance - treasury;
-    //events[e].commision = [insurance , treasury , privateaser];
     events[e].commission.insurance = insurance;
     events[e].commission.treasury = treasury;
     events[e].commission.privateaser= privateaser;
-
-
    }
+}
+
+function step4(){
+  for (let e = 0; e<events.length ; e++){
+    if(events[e].options.deductibleReduction == true){
+      events[e].price = events[e].price + 1*events[e].persons;
+    }
+  }
 }
 
 
 step1();
 step2();
 step3();
+step4(); 
