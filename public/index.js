@@ -183,6 +183,22 @@ function step2(){
   //step1();
 }
 
+function step3(){
+  for( let e = 0; e<events.length; e++){
+    var commission = events[e].price * 0.3;
+    var insurance = commission / 2 ;
+    var treasury = 1* events[e].persons;
+    var privateaser = commission - insurance - treasury;
+    //events[e].commision = [insurance , treasury , privateaser];
+    events[e].commission.insurance = insurance;
+    events[e].commission.treasury = treasury;
+    events[e].commission.privateaser= privateaser;
+
+
+   }
+}
+
 
 step1();
 step2();
+step3();
